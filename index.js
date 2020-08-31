@@ -5,30 +5,33 @@ const bot       = new Discord.Client();
 /*
  * Server specifics
  * */
-const tagChannels = {
+function TagChannel (name, id, embedColor, titleMessage)  {
+  this.name         = name;
+  this.id           = id;
+  this.embedColor   = embedColor;
+  this.titleMessage = titleMessage;
+};
 
-    addChannel: function (name, id, embedColor, titleMessage) {
-      this[name] = {
-        id:           id,
-        embedColor:   embedColor,
-        titleMessage: titleMessage,
+TagChannel.prototype.createEmbed = function (author, content, thumbnail="") {
+  return new Discord.MessageEmbed()
+    .setColor(this.embedColor)
+    .setTitle(this.titleMessage(author))
+    .setDescription(content)
+    .setThumbnail(thumbnail);
+};
 
-        createEmbed:  function (author="", content="", thumbnail="") {
-          return new Discord.MessageEmbed()
-            .setColor(this.embedColor)
-            .setTitle(this.titleMessage(author))
-            .setDescription(content)
-            .setThumbnail(thumbnail);
-        }
-      };
-    },
+let tagChannels = {
 
-    getChannelById: function (id) {
-      for (let key in this) {
-        if (this[key]?.id == id) return this[key];
-      }
-      return null;
-    },
+  addChannel: function (name, id, embedColor, titleMessage) {
+    this[name] = new TagChannel(name, id, embedColor, titleMessage);
+  },
+
+  getChannelById: function (id) {
+    for (let key in this) {
+      if (this[key]?.id == id) return this[key];
+    }
+    return null;
+  },
 };
 
 tagChannels.addChannel(
@@ -51,6 +54,7 @@ tagChannels.addChannel(
   embedColor   = "#7775ca",
   titleMessage = (username) => ((username ?? "Anonym") + " wünscht sich folgendes:")
 );
+
 
 /*
  * Bot login
@@ -94,6 +98,7 @@ bot.on("message", async message => {
 
 } 
 });
+
 
 /*
  * Functions

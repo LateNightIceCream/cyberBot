@@ -3,21 +3,10 @@ const botconfig = require("./botconfig.json");
 const bot       = new Discord.Client();
 
 /*
- * Server specifics and variables
+ * Server specifics
  * */
-const channels = {
+const tagChannels = {
 
-  chatChannels: {
-    schwarzesBrett: {
-      id: "749376233631907931",
-    },
-
-    huehnerhof: {
-      id: "749390915902374040",
-    },
-  },
-
-  tagChannels: {
     addChannel: function (name, id, embedColor, titleMessage) {
       this[name] = {
         id:           id,
@@ -40,32 +29,28 @@ const channels = {
       }
       return null;
     },
-  },
-}
+};
 
-channels.tagChannels.addChannel(
+tagChannels.addChannel(
   name         = "feedback",
   id           = "749613262135361557",
   embedColor   = "#3a9be0",
   titleMessage = (username) =>  ("Feedback von " + (username ?? "Anonym") + ":")
 );
 
-channels.tagChannels.addChannel(
+tagChannels.addChannel(
   name         = "spielvorschlaege",
   id           = "749613506084470844",
   embedColor   = "#e65755",
   titleMessage = (username) => ((username ?? "Anonym") + " schlägt vor:")
 );
 
-channels.tagChannels.addChannel(
+tagChannels.addChannel(
   name         = "wunschbrunnen",
   id           = "749613571113222214",
   embedColor   = "#7775ca",
   titleMessage = (username) => ((username ?? "Anonym") + " wünscht sich folgendes:")
 );
-
-channels.tagChannels["wunschbrunnen"].titleMessage("uwu");
-
 
 /*
  * Bot login
@@ -84,7 +69,7 @@ bot.on("message", async message => {
 
   if (message.author.bot) return; //  prevent feedbacks
 
-  sendEmbedIfSuggestion(message);
+  sendEmbedIfTagged(message);
 
   /*
    * Bot commands
@@ -115,23 +100,27 @@ bot.on("message", async message => {
  **/
 function separateIdAndContent (str) {
 
+  if (str.charAt(0) !== "<") return null;
+
   let idString = str.split(" ")[0];
+  let id = idString.slice(2, idString.length-1);
+
+  if (isNaN(id)) return null;
 
   return {
-    id:      idString.slice(2, idString.length-1),
+    id:      id,
     content: str.replace(idString, "")
   };
 
 }
 
-function sendEmbedIfSuggestion (message) {
+function sendEmbedIfTagged (message) {
 
   let splitMessage = separateIdAndContent(message.content);
+  if (splitMessage == null || splitMessage.content === "") return;
 
-  let channel = channels.tagChannels.getChannelById(splitMessage.id);
-
+  let channel = tagChannels.getChannelById(splitMessage.id);
   if (channel == null) return;
-  if (splitMessage.content === "") return;
 
   let embed = channel.createEmbed(message.author.username,
                                   splitMessage.content,

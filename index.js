@@ -1,6 +1,6 @@
 const Discord   = require("discord.js");
-const bot       = new Discord.Client();
 const botconfig = require("./botconfig.json");
+const bot       = new Discord.Client();
 
 /*
  * Server specifics and variables
@@ -18,35 +18,54 @@ const channels = {
   },
 
   tagChannels: {
+    addChannel: function (name, id, embedColor, titleMessage) {
+      this[name] = {
+        id:           id,
+        embedColor:   embedColor,
+        titleMessage: titleMessage,
 
-    feedback: {
-      id: "749613262135361557",
-      embedColor: "#3a9be0",
-
-      titleMessage: function (userName = "Anonym") {
-        return "Feedback von " + userName;
-      },
+        createEmbed:  function (author="", content="", thumbnail="") {
+          return new Discord.MessageEmbed()
+            .setColor(this.embedColor)
+            .setTitle(this.titleMessage(author))
+            .setDescription(content)
+            .setThumbnail(thumbnail);
+        }
+      };
     },
 
-    spielvorschlaege: {
-      id: "749613506084470844",
-      embedColor: "#e65755",
-
-      titleMessage: function (userName = "Anonym") {
-        return userName + " schlägt vor:";
-      },
-    },
-
-    wunschbrunnen: {
-      id: "749613571113222214",
-      embedColor: "#E69E35",
-
-      titleMessage: function (userName = "Anonym") {
-        return userName + " wünscht sich folgendes:";
-      },
+    getChannelById: function (id) {
+      for (let key in this) {
+        if (this[key]?.id == id) return this[key];
+      }
+      return null;
     },
   },
 }
+
+channels.tagChannels.addChannel(
+  name         = "feedback",
+  id           = "749613262135361557",
+  embedColor   = "#3a9be0",
+  titleMessage = (username) =>  ("Feedback von " + (username ?? "Anonym") + ":")
+);
+
+channels.tagChannels.addChannel(
+  name         = "spielvorschlaege",
+  id           = "749613506084470844",
+  embedColor   = "#e65755",
+  titleMessage = (username) => ((username ?? "Anonym") + " schlägt vor:")
+);
+
+channels.tagChannels.addChannel(
+  name         = "wunschbrunnen",
+  id           = "749613571113222214",
+  embedColor   = "#7775ca",
+  titleMessage = (username) => ((username ?? "Anonym") + " wünscht sich folgendes:")
+);
+
+channels.tagChannels["wunschbrunnen"].titleMessage("uwu");
+
 
 /*
  * Bot login
@@ -99,53 +118,25 @@ function separateIdAndContent (str) {
   let idString = str.split(" ")[0];
 
   return {
-    id: idString.slice(2, idString.length-1),
+    id:      idString.slice(2, idString.length-1),
     content: str.replace(idString, "")
   };
 
 }
 
-function idIsTagChannelId (potentialId) {
-
-  for (let key in channels.tagChannels) {
-    if (channels.tagChannels[key]?.id == potentialId) return true;
-  }
-
-  return false;
-
-}
-
-function createEmbedFromChannelId (id, author, thumbnail, content) {
-
-  let embedColor = "#FFFFFF";
-  let titleMessage = "";
-
-  for (let key in channels.tagChannels) {
-    if (channels.tagChannels[key]?.id == id) {
-      embedColor   = channels.tagChannels[key].embedColor;
-      titleMessage = channels.tagChannels[key].titleMessage(author);
-    }
-  }
-
-  return new Discord.MessageEmbed()
-    .setColor(embedColor)
-    .setTitle(titleMessage)
-    .setDescription(content)
-    .setThumbnail(thumbnail);
-
-}
-
 function sendEmbedIfSuggestion (message) {
 
-  splitMessage = separateIdAndContent(message.content);
+  let splitMessage = separateIdAndContent(message.content);
 
-  if (!idIsTagChannelId(splitMessage.id)) return;
+  let channel = channels.tagChannels.getChannelById(splitMessage.id);
+
+  if (channel == null) return;
   if (splitMessage.content === "") return;
 
-  let embed = createEmbedFromChannelId(splitMessage.id,
-                                       message.author.username,
-                                       message.author.avatarURL(),
-                                       splitMessage.content);
+  let embed = channel.createEmbed(message.author.username,
+                                  splitMessage.content,
+                                  message.author.avatarURL()
+                                 );
 
   bot.channels.cache.get(splitMessage.id).send(embed);
 

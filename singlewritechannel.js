@@ -1,5 +1,3 @@
-const Discord = require("discord.js");
-
 function SingleWriteChannel (channelId, bot, exceptionRoleIds = [], approvedRoleIds = []) {
     this.channelId           = channelId;
     this.exceptionRoleIds    = exceptionRoleIds;
@@ -30,6 +28,8 @@ SingleWriteChannel.prototype.userAlreadySentMessage = function (userToCheck) {
 }
 
 SingleWriteChannel.prototype.checkAndNotify = function (message) {
+
+    if (message.channel.id != this.channelId) return false;
 
     let userRole = message.member.roles.cache.filter( role => role.name !== "@everyone").first();
 

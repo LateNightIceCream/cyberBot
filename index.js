@@ -1,10 +1,12 @@
 const Discord      = require("discord.js");
 const TagChannels  = require("./tagchannels.js");
 const UserProfiles = require("./profiles.js");
+const SingleWrite  = require("./singlewritechannel.js");
 const botconfig    = require("./botconfig.json");
 const bot          = new Discord.Client();
 const tagChannels  = new TagChannels.Channels();
 const profiles     = new UserProfiles.Profiles();
+
 
 tagChannels.addChannel(
   name         = "feedback",
@@ -29,8 +31,19 @@ tagChannels.addChannel(
 
 let checkIn = { // remove?
   id:     "749368247656382489",
-  testid: "749611153730306120"
+  testid: "749611153730306120",
+
+  approvedRoleIds: [
+    "749370811001077881",
+    "749371713547927564"
+  ],
+  moderatorIds: [
+    "749370296502583357"
+  ],
 };
+
+
+const checkInSingleWrite =  new SingleWrite.SingleWriteChannel(checkIn.id, bot, checkIn.moderatorIds, checkIn.approvedRoleIds);
 
 /*
  * Bot login
@@ -43,6 +56,7 @@ bot.on("ready", async () => {
   bot.user.setActivity("Space Invaders 🚀");
 
   profiles.initializeExistingProfiles(checkIn.id, bot);
+  checkInSingleWrite.initializeChannelMessages();
 
 });
 
@@ -52,6 +66,8 @@ bot.on("ready", async () => {
 bot.on("message", async message => {
 
   if (message.author.bot) return; //  prevent feedbacks
+
+  checkInSingleWrite.checkAndNotify(message);
 
   profiles.sendMatchesIfProfileMessage(message, checkIn.testid, bot);
 

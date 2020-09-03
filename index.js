@@ -12,21 +12,21 @@ tagChannels.addChannel(
   name         = "feedback",
   id           = "749613262135361557",
   embedColor   = "#3a9be0",
-  titleMessage = (username = "Anonym") =>  ("Feedback von " + (username)  + ":") // "??" operator needs node v14
+  titleMessage = (username) =>  ("Feedback von " + (username ?? "Anonym")  + ":") // "??" operator needs node v14
 );
 
 tagChannels.addChannel(
   name         = "spielvorschlaege",
   id           = "749613506084470844",
   embedColor   = "#e65755",
-  titleMessage = (username = "Anonym") => ((username) + " schlägt vor:")
+  titleMessage = (username) => ((username ?? "Anonym") + " schlägt vor:")
 );
 
 tagChannels.addChannel(
   name         = "wunschbrunnen",
   id           = "749613571113222214",
   embedColor   = "#7775ca",
-  titleMessage = (username = "Anonym") => ((username) + " wünscht sich folgendes:")
+  titleMessage = (username) => ((username ?? "Anonym") + " wünscht sich folgendes:")
 );
 
 let checkIn = { // remove?
@@ -57,10 +57,6 @@ bot.on("ready", async () => {
 
   profiles.initializeExistingProfiles(checkIn.id, bot);
   checkInSingleWrite.initializeChannelMessages();
-
-//  let chan = bot.channels.cache.get("749613262135361557");
-
- // chan.send("_Hier könnte dein Feedback stehen!_\nUm Feedback dazulassen, musst du eine Nachricht schreiben, die mit \"#feedback\" beginnt.");
 
 });
 

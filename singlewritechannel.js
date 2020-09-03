@@ -11,14 +11,11 @@ SingleWriteChannel.prototype.initializeChannelMessages = function () {
     let channel = this.bot.channels.cache.get(this.channelId);
 
     let messages = channel.messages.fetch().then( messages => {
-
         this.messageAuthorCache = messages.map( message => message.author);
-
     });
 }
 
 SingleWriteChannel.prototype.userAlreadySentMessage = function (userToCheck) {
-
     for ( let user of this.messageAuthorCache ) {
         if (user.id == userToCheck.id) {
             return true;

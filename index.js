@@ -3,7 +3,7 @@ const TagChannels  = require("./tagchannels.js");
 const UserProfiles = require("./profiles.js");
 const SingleWrite  = require("./singlewritechannel.js");
 const botconfig    = require("./botconfig.json");
-const bot          = new Discord.Client();
+const bot          = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 const tagChannels  = new TagChannels.Channels();
 const profiles     = new UserProfiles.Profiles();
 
@@ -59,6 +59,26 @@ bot.on("ready", async () => {
   checkInSingleWrite.initializeChannelMessages();
 
 });
+
+bot.on('messageReactionAdd', async (reaction, user) => {
+  // When we receive a reaction we check if the reaction is partial or not
+  if (reaction.partial) {
+    // If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
+    try {
+      await reaction.fetch();
+    } catch (error) {
+      console.log('Something went wrong when fetching the message: ', error);
+      // Return as `reaction.message.author` may be undefined/null
+      return;
+    }
+  }
+
+  if (reaction.emoji.id == "750036575026675814" && reaction.count == 4 ) {
+    reaction.message.channel.send("**" + reaction.message.author.username + "**" + " ist sehr **horny**!");
+  }
+
+});
+
 
 /*
  * Message handling

@@ -11,7 +11,9 @@ SingleWriteChannel.prototype.initializeChannelMessages = function () {
     let channel = this.bot.channels.cache.get(this.channelId);
 
     let messages = channel.messages.fetch().then( messages => {
-        this.messageAuthorCache = messages.map( message => message.author);
+        this.messageAuthorCache = messages
+            .filter( message => !message.deleted && !message.system )
+            .map( message => message.author);
     });
 }
 
@@ -52,7 +54,7 @@ SingleWriteChannel.prototype.checkAndNotify = function (message) {
     }
     else {
         // already sent message + role == not approved
-        notification = "Bitte warte auf deine Bestätigung! <:chicken:750811941269930126>\nSolltest du Probleme haben, melde dich bitte bei den Modhühnchen!";
+        notification = "Bitte warte auf deine Bestätigung! <:chicken:750811941269930126>\nSolltest du Probleme haben, melde dich bitte bei den Modhühnchen! (Sollte dein Steckbrief gelöscht worden sein, melde dich bitte bei den Mods)";
     }
 
     message.delete().catch(O_o => {});

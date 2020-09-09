@@ -14,8 +14,6 @@ SingleWriteChannel.prototype.initializeChannelMessages = function () {
         this.messageAuthorCache = messages
             .filter( message => !message.deleted && !message.system )
             .map( message => message.author);
-        console.log(this.messageAuthorCache);
-        console.log("---------------------");
     });
 }
 

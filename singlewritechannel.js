@@ -14,6 +14,8 @@ SingleWriteChannel.prototype.initializeChannelMessages = function () {
         this.messageAuthorCache = messages
             .filter( message => !message.deleted && !message.system )
             .map( message => message.author);
+        console.log(this.messageAuthorCache);
+        console.log("---------------------");
     });
 }
 
@@ -64,7 +66,7 @@ SingleWriteChannel.prototype.checkAndNotify = function (message) {
 }
 
 SingleWriteChannel.prototype.messageConformsWithProfile = function (message) {
-    message.content.toLowerCase().includes("nick");
+    return message.content.toLowerCase().includes("nick");
 }
 
 SingleWriteChannel.prototype.addUser = function (user) {

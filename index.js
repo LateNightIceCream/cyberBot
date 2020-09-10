@@ -89,7 +89,7 @@ bot.on("message", async message => {
 
   checkInSingleWrite.checkAndNotify(message);
 
-  profiles.sendMatchesIfProfileMessage(message, checkIn.testid, bot);
+  profiles.sendMatchesIfProfileMessage(message, checkIn.id, bot);
 
   tagChannels.sendEmbedIfTagged(message, bot);
 

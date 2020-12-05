@@ -1,3 +1,5 @@
+let fs = require("fs")
+
 function SingleWriteChannel (channelId, bot, exceptionRoleIds = [], approvedRoleIds = []) {
     this.channelId           = channelId;
     this.exceptionRoleIds    = exceptionRoleIds;
@@ -57,6 +59,7 @@ SingleWriteChannel.prototype.checkAndNotify = function (message) {
         notification = "Bitte warte auf deine Bestätigung! <:chicken:750811941269930126>\nSolltest du Probleme haben, melde dich bitte bei den Modhühnchen! (Sollte dein Steckbrief gelöscht worden sein, melde dich bitte bei den Mods)";
     }
 
+    this.logMessageDeletion(message);
     message.delete().catch(O_o => {});
     message.author.send(notification);
 
@@ -69,6 +72,16 @@ SingleWriteChannel.prototype.messageConformsWithProfile = function (message) {
 
 SingleWriteChannel.prototype.addUser = function (user) {
     this.messageAuthorCache.push(user);
+}
+
+SingleWriteChannel.prototype.logMessageDeletion = function (message) {
+
+    let log = message.content + "\n=============================\n\n";
+
+    fs.appendFile("deletionLog.txt", log, err => {
+        if (err) console.log(err);
+        console.log("Logged a deletion");
+    });
 }
 
 /*----------------------------*/

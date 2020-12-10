@@ -44,24 +44,25 @@ SingleWriteChannel.prototype.checkAndNotify = function (message) {
         return true;
     }
 
-    let notification;
+    let notification = message.content + "\n\n";
 
     if (!userAlreadySentMessage) {
         // wrong format + not yet sent a message
-        notification = "Bitte erstelle zuerst deinen Steckbrief und folge dem richtigen Format. <:melon:750838132823556167>";
+        notification += "Bitte erstelle zuerst deinen Steckbrief und folge dem richtigen Format. <:melon:750838132823556167>";
     }
     else if (this.approvedRoleIds.includes(userRole?.id)) { // may not be defined bc of filter
         // already sent message + role == approved
-        notification = "Du bist bereits bestätigt! <:star:750810999883431937>\nUm mit den anderen zu chatten, nutze bitte den \"**Hühnerhof**\"-Channel";
+        notification += "Du bist bereits bestätigt! <:star:750810999883431937>\nUm mit den anderen zu chatten, nutze bitte den \"**Hühnerhof**\"-Channel";
     }
     else {
         // already sent message + role == not approved
-        notification = "Bitte warte auf deine Bestätigung! <:chicken:750811941269930126>\nSolltest du Probleme haben, melde dich bitte bei den Modhühnchen! (Sollte dein Steckbrief gelöscht worden sein, melde dich bitte bei den Mods)";
+        notification += "Bitte warte auf deine Bestätigung! <:chicken:750811941269930126>\nSolltest du Probleme haben, melde dich bitte bei den Modhühnchen! (Sollte dein Steckbrief gelöscht worden sein, melde dich bitte bei den Mods)";
     }
 
-    this.logMessageDeletion(message);
     message.delete().catch(O_o => {});
     message.author.send(notification);
+
+    this.logMessageDeletion(message);
 
     return true;
 }

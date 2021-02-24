@@ -44,7 +44,7 @@ let checkIn = { // remove?
 
 
 const checkInSingleWrite =  new SingleWrite.SingleWriteChannel(checkIn.id, bot, checkIn.moderatorIds, checkIn.approvedRoleIds);
-
+                                 
 /*
  * Bot login
  * */
@@ -58,6 +58,12 @@ bot.on("ready", async () => {
   profiles.initializeExistingProfiles(checkIn.id, bot);
   checkInSingleWrite.initializeChannelMessages();
 
+});
+
+bot.on("messageDelete", (message, channel) => {
+  if (channel.id == checkInSingleWrite.channelId) {
+    checkInSingleWrite.initializeChannelMessages();
+  }
 });
 
 bot.on('messageReactionAdd', async (reaction, user) => {
